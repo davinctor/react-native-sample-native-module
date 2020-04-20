@@ -4,10 +4,14 @@ import {
   EmitterSubscription,
 } from 'react-native';
 
-interface PickMediaOptions {
+type PickMediaOptions = {
   mediaType?: string;
   title?: string;
-}
+};
+
+type PickMediaResult = {
+  mediaUri?: string;
+};
 
 type SampleNativeModuleType = {
   AUDIO_MEDIA_TYPE: string;
@@ -15,7 +19,7 @@ type SampleNativeModuleType = {
   PHOTO_MEDIA_TYPE: string;
   sum(a: number, b: number, callback: (sum: number) => any): void;
   getDeviceName(): Promise<string>;
-  pickMedia(options: PickMediaOptions): Promise<object>;
+  pickMedia(options: PickMediaOptions): Promise<PickMediaResult>;
   registerActivityLifecycleListener(
     callback: (event: object) => any
   ): EmitterSubscription;
@@ -46,4 +50,4 @@ export default {
   sum,
   getDeviceName,
   pickMedia,
-} as SampleNativeModuleType;
+};

@@ -5,44 +5,58 @@ import {
   Text,
   TouchableOpacity,
   EmitterSubscription,
+  Image,
 } from 'react-native';
 import SampleNativeModule from 'react-native-sample-native-module';
+
+const {
+  pickMedia,
+  PHOTO_MEDIA_TYPE,
+  sum,
+  getDeviceName,
+  registerActivityLifecycleListener,
+} = SampleNativeModule;
 
 type Props = {};
 
 type State = {
   deviceName?: string;
-  sum?: number;
+  sumResult?: number;
+  uri?: string;
 };
 
 export default class App extends React.Component<Props, State> {
-  state: State = {};
+  state: State = {
+    deviceName: undefined,
+    sumResult: 0,
+    uri: undefined,
+  };
   lifecycleEventListener?: EmitterSubscription;
 
   runPickMedia = async () => {
-    const result = await SampleNativeModule.pickMedia({
-      mediaType: SampleNativeModule.PHOTO_MEDIA_TYPE,
+    const { mediaUri } = await pickMedia({
+      mediaType: PHOTO_MEDIA_TYPE,
       title: 'Pick audio',
     });
-    console.log(result);
+    this.setState({ uri: mediaUri });
   };
 
   calculateSum = () => {
-    SampleNativeModule.sum(
+    sum(
       Math.round(1000 * Math.random()),
       Math.round(100 * Math.random()),
-      (result: number) => this.setState({ sum: result })
+      (result: number) => this.setState({ sumResult: result })
     );
   };
 
   componentDidMount() {
-    SampleNativeModule.getDeviceName().then(value =>
+    getDeviceName().then(value =>
       this.setState({
         deviceName: value,
       })
     );
-    this.lifecycleEventListener = SampleNativeModule.registerActivityLifecycleListener(
-      event => console.log(event)
+    this.lifecycleEventListener = registerActivityLifecycleListener(event =>
+      console.log(event)
     );
   }
 
@@ -53,16 +67,17 @@ export default class App extends React.Component<Props, State> {
   }
 
   render() {
-    const { deviceName, sum } = this.state;
+    const { deviceName, sumResult, uri } = this.state;
     return (
       <View style={styles.container}>
         <Text>Device name: {deviceName}</Text>
         <TouchableOpacity onPress={this.calculateSum}>
-          <Text>Sum: {sum}</Text>
+          <Text>Sum: {sumResult}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={this.runPickMedia}>
           <Text>PICK MEDIA</Text>
         </TouchableOpacity>
+        {uri && <Image style={styles.image} source={{ uri: uri }} />}
       </View>
     );
   }
@@ -74,5 +89,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column',
+  },
+  image: {
+    height: 200,
+    width: 200,
   },
 });
