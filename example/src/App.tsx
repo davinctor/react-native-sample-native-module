@@ -50,7 +50,7 @@ export default class App extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    getDeviceName().then(value =>
+    getDeviceName().then((value: string) =>
       this.setState({
         deviceName: value,
       })
